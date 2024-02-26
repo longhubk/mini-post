@@ -1,0 +1,61 @@
+version: '3.7'
+services:
+  mini-post-database-service:
+    image: postgres:13
+    container_name: mini-post-database-postgres
+    ports:
+      - '${DATABASE_PORT}:5432'
+    networks:
+      - mini-post-net
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - mini-post-database-postgres_data:/var/lib/postgresql/data
+    # env_file:
+    #   - path: ./mini-post.database.env
+    #     required: true
+
+  mini-post-caching-service:
+    image: 'redis:latest'
+    container_name: mini-post-caching-redis
+    hostname: redis
+    networks:
+      - mini-post-net
+    ports:
+      - '${CACHING_PORT}:6379'
+    command: '--requirepass ${CACHING_PASSWORD}'
+    # env_file:
+    #   - path: ./mini-post.caching.env
+    #     required: true
+    volumes:
+      - mini-post-caching-redis-volume:/data
+
+  mini-post-backend-service:
+    container_name: mini-post-server-nestjs
+    build:
+      context: ./
+    ports:
+      - '${SERVER_HTTP_PORT}:${SERVER_HTTP_PORT}'
+      - '${SERVER_SOCKET_PORT}:${SERVER_SOCKET_PORT}'
+    networks:
+      - mini-post-net
+    # env_file:
+    #   - path: ./mini-post.server.env
+    #     required: true
+    #   - path: ./mini-post.caching.env
+    #     required: true
+    #   - path: ./mini-post.database.env
+    #     required: true
+    depends_on:
+      - mini-post-database-service
+      - mini-post-caching-service
+
+volumes:
+  mini-post-database-postgres_data:
+  mini-post-caching-redis-volume:
+
+networks:
+  mini-post-net:
+    driver: bridge
