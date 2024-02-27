@@ -19,7 +19,7 @@ import { AuthService } from './auth.service';
         };
         return jwtModuleOptions;
       },
-    }),
+    }), // TODO: register for refresh token bellow
   ],
   providers: [AuthService, JwtModule],
   controllers: [AuthController],

@@ -56,3 +56,5 @@ export class AuthGuard implements CanActivate {
     return type;
   }
 }
+
+// TODO: create guard for refresh token here or in another file
