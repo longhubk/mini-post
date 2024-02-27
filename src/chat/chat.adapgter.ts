@@ -1,4 +1,3 @@
-
 import { INestApplication, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IoAdapter } from '@nestjs/platform-socket.io';
@@ -16,19 +15,17 @@ export class RedisIoAdapter extends IoAdapter {
   }
 
   async connectToRedis(): Promise<void> {
-    const redisUrl = `redis://${this.configService.get('CACHING_HOST')}:${this.configService.get('CACHING_PORT')}/${this.configService.get('CACHING_DB')}`;
-    const password = this.configService.get('CACHING_PASSWORD');
+    const redisHost = this.configService.get<string>('CACHING_HOST');
+    const redisPort = this.configService.get<string>('CACHING_PORT');
+    const redisDB = this.configService.get<string>('CACHING_DB');
+    const password = this.configService.get<string>('CACHING_PASSWORD');
 
-    this.logger.debug({ redisUrl, password });
-    this.logger.debug({ hello: 12345 });
+    const redisUrl = `redis://${redisHost}:${redisPort}/${redisDB}`;
+
+    this.logger.debug({ redisUrl });
     const pubClient = createClient({
       url: redisUrl,
-      // url: 'redis://mini-post-caching-service:6379/5',
-      // username: 'default',
-      // password: this.configService.get('CACHING_PASSWORD'),
       password,
-      // password: 'm2pakRP2LSrR4q6ym4gcXStzUwFFbjvA5upEgW2gePKUDCgQIU',
-
     });
     const subClient = pubClient.duplicate();
 
@@ -38,9 +35,11 @@ export class RedisIoAdapter extends IoAdapter {
   }
 
   createIOServer(port: number, options?: ServerOptions): any {
-    const socketPort = this.configService.get('SOCKET_PORT');
-    this.logger.debug({ socketPort });
-    const server = super.createIOServer(port, options);
+    const socketPort: number = parseInt(
+      this.configService.get('SERVER_SOCKET_PORT') || '3006',
+    );
+    this.logger.debug({ socketPort, defaultPort: port });
+    const server = super.createIOServer(socketPort, options);
     server.adapter(this.adapterConstructor);
     return server;
   }

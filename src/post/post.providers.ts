@@ -1,6 +1,7 @@
-import { DATA_SOURCE, POST_REPO } from 'src/database/database.constants';
+import { DATA_SOURCE } from 'src/database/database.constants';
 import { DataSource } from 'typeorm';
 import { Post } from './entities/post.entity';
+import { POST_REPO } from './post.interface';
 
 export const postProviders = [
   {

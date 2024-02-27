@@ -19,7 +19,7 @@ const NESTIA_CONFIG: INestiaConfig = {
   swagger: {
     output: "./swagger.json",
     beautify: true,
-    security: {
+    security: { // TODO: check here to fix: can not add "Bearer" in to token
       bearer: {
         type: "apiKey",
         name: "Authorization",

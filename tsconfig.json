@@ -1,6 +1,4 @@
 {
-  "strict": true,
-  "strictNullChecks": true,
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
@@ -8,27 +6,23 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
+    "target": "ES2019",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "paths": {
-      "@app/jwt": [
-        "libs/jwt/src"
-      ],
-      "@app/jwt/*": [
-        "libs/jwt/src/*"
-      ]
-    },
     "plugins": [
       { "transform": "typia/lib/transform" },
-      { 
+      {
         "transform": "@nestia/core/lib/transform",
-        "validate": "assert",
-        "stringify": "assert", 
-      },
+        // "validate": "assert",
+        "stringify": "assert",
+        "validate": "valiateEquals",
+
+      }
     ],
+    "strict": true, // nestia required
+    "strictPropertyInitialization": false
   }
 }

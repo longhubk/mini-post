@@ -1,53 +1,45 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-
+import fastifyCsrf from '@fastify/csrf-protection';
+import fastifyHelmet from '@fastify/helmet';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
+import { NestFactory } from '@nestjs/core';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module';
 import { RedisIoAdapter } from './chat/chat.adapgter';
+
 
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);
-  // const app = await NestFactory.create(AppModule);
-  // await app.listen(3000);
 
-  const app = await NestFactory.create<NestFastifyApplication>(
+  const app: NestFastifyApplication = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
-    { cors: true }
+    { cors: true },
   );
 
-  const configService = app.get(ConfigService)
+  await app.register(fastifyHelmet as any); //TODO: fix type version fastify and helmet
+  await app.register(fastifyCsrf as any); //TODO: fix type version fastify and csrf
 
+
+  const configService = app.get(ConfigService);
 
   const redisIoAdapter = new RedisIoAdapter(app, configService);
   await redisIoAdapter.connectToRedis();
-
-  // app.useWebSocketAdapter();
   app.useWebSocketAdapter(redisIoAdapter);
 
   const serverPort = configService.get('SERVER_HTTP_PORT') || 3002;
   const socketPort = configService.get('SERVER_SOCKET_PORT') || 3003;
-  const serverAddress = '0.0.0.0';
 
-  const dbPort = configService.get('DATABASE_PORT');
+  const serverUrl = `http://localhost:${serverPort}`;
 
-  const serverUrl = `http://127.0.0.1:${serverPort}`;
-
-  const docs = require("swagger.json");
+  const docs = require('../../swagger.json');
   docs.servers = [{ url: serverUrl }];
-  SwaggerModule.setup("swagger", app, docs);
+  SwaggerModule.setup('swagger', app, docs);
 
+  await app.listen(serverPort, '0.0.0.0');
 
-  await app.listen(serverPort, serverAddress);
-
-  logger.log(`Server HTTP is running on ${serverUrl}`)
-  logger.log(`Server Socket is running on ${serverAddress}:${socketPort}`)
-  logger.log({ dbPort })
-
+  logger.log(`Server HTTP is running on ${serverUrl}`);
+  logger.log(`Server Socket is running on ws://127.0.0.1:${socketPort}`);
 }
 bootstrap();

@@ -1,19 +1,29 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEnity } from 'src/common/common.interface';
+import { User } from 'src/user/entities/user.entity';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { CONTENT_MAX_LEN, IPost, TITLE_MAX_LEN } from '../post.interface';
 
 @Entity()
-export class Post {
+export class Post extends BaseEnity implements IPost {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 500 })
+  @Column({ length: TITLE_MAX_LEN })
   title: string;
 
-  @Column('text')
+  @Column({ length: CONTENT_MAX_LEN })
   content: string;
 
   @Column('int')
   views: number;
 
-  @Column()
+  @Column({ type: 'boolean' })
   isPublished: boolean;
+
+  @Column()
+  userId: number;
+
+  @ManyToOne((type) => User, (user) => user.posts)
+  @JoinColumn({ name: 'userId' })
+  user: User | number;
 }

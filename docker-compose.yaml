@@ -10,12 +10,10 @@ services:
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD} # TODO: create new roles for dev and test
     volumes:
       - mini-post-database-postgres_data:/var/lib/postgresql/data
-    # env_file:
-    #   - path: ./mini-post.database.env
-    #     required: true
+    restart: unless-stopped
 
   mini-post-caching-service:
     image: 'redis:latest'
@@ -26,11 +24,9 @@ services:
     ports:
       - '${CACHING_PORT}:6379'
     command: '--requirepass ${CACHING_PASSWORD}'
-    # env_file:
-    #   - path: ./mini-post.caching.env
-    #     required: true
     volumes:
       - mini-post-caching-redis-volume:/data
+    restart: unless-stopped
 
   mini-post-backend-service:
     container_name: mini-post-server-nestjs
@@ -41,16 +37,10 @@ services:
       - '${SERVER_SOCKET_PORT}:${SERVER_SOCKET_PORT}'
     networks:
       - mini-post-net
-    # env_file:
-    #   - path: ./mini-post.server.env
-    #     required: true
-    #   - path: ./mini-post.caching.env
-    #     required: true
-    #   - path: ./mini-post.database.env
-    #     required: true
     depends_on:
       - mini-post-database-service
       - mini-post-caching-service
+    restart: unless-stopped
 
 volumes:
   mini-post-database-postgres_data:

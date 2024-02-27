@@ -1,36 +1,63 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 
-import { POST_REPO } from 'src/database/database.constants';
-import { Repository } from 'typeorm';
+import { UniqueUser } from 'src/user/user.interface';
+import { FindOptionsWhere, Repository, UpdateResult } from 'typeorm';
 import { Post } from './entities/post.entity';
+import { FindManyPost, IPost, POST_REPO, UniquePost } from './post.interface';
 
 @Injectable()
 export class PostService {
   constructor(
     @Inject(POST_REPO)
-    private postRepo: Repository<Post>,
-  ) { }
+    private readonly postRepo: Repository<Post>,
+  ) {}
 
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  protected async checkExisted(query: FindOptionsWhere<Post>): Promise<number> {
+    const existed = await this.postRepo.count({ where: query });
+    if (!existed) {
+      throw new NotFoundException('POST_NOT_FOUND');
+    }
+    return existed;
   }
 
-  async findAll() {
-    return await this.postRepo.find();
-    // return `This action returns all post`;
+  public async create(
+    uniqueUser: Partial<UniqueUser>,
+    createPostDto: CreatePostDto,
+  ): Promise<IPost> {
+    const post = this.postRepo.create({
+      ...createPostDto,
+      views: 0,
+      user: uniqueUser.id,
+    });
+    return this.postRepo.save(post);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  public findAll(query: FindManyPost): Promise<IPost[]> {
+    console.log({ query });
+    return this.postRepo.find({ where: query });
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  public async findOne(query: UniquePost): Promise<IPost | null> {
+    console.log({ query });
+    return this.postRepo.findOne({ where: query });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  public async update(
+    uniqueUser: Partial<UniqueUser>,
+    query: UniquePost,
+    updatePostDto: UpdatePostDto,
+  ): Promise<UpdateResult> {
+    await this.checkExisted({ ...query, user: uniqueUser.id });
+    return this.postRepo.update(query, updatePostDto);
+  }
+
+  public async remove(
+    uniqueUser: Partial<UniqueUser>,
+    query: UniquePost,
+  ): Promise<UpdateResult> {
+    await this.checkExisted({ ...query, user: uniqueUser.id });
+    return this.postRepo.softDelete(query);
   }
 }
