@@ -1,10 +1,10 @@
-import { TypedBody, TypedParam, TypedRoute } from '@nestia/core';
+import { TypedBody, TypedParam, TypedQuery, TypedRoute } from '@nestia/core';
 import { Body, Controller, Request } from '@nestjs/common';
-import { AppRequest } from 'src/common/common.interface';
+import { AppRequest, GenericFilter } from 'src/common/common.interface';
 import { UpdateResult } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { IPost } from './post.interface';
+import { IPost, PaginatePostResponse } from './post.interface';
 import { PostService } from './post.service';
 
 @Controller('post')
@@ -28,8 +28,12 @@ export class PostController {
    * @security bearer
    */
   @TypedRoute.Get()
-  findAll(@Request() req: AppRequest): Promise<IPost[]> {
-    return this.postService.findAll({ user: req.user.id });
+  async findAll(
+    @Request() req: AppRequest,
+    @TypedQuery() query: GenericFilter<IPost>,
+  ): Promise<PaginatePostResponse> {
+    const [posts, total] = await this.postService.findAll(query, { user: req.user.id });
+    return { posts, total };
   }
 
   /**

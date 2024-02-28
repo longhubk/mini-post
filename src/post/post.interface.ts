@@ -32,3 +32,8 @@ export const TITLE_MAX_LEN = STRING_MAX_LEN;
 
 export const CONTENT_MIN_LEN = 10;
 export const CONTENT_MAX_LEN = 500;
+
+export interface PaginatePostResponse {
+  posts: IPost[];
+  total: number;
+}

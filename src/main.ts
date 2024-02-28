@@ -34,7 +34,7 @@ async function bootstrap() {
   const serverUrl = `http://localhost:${serverPort}`;
 
   const docs = require('../../swagger.json');
-  docs.servers = [{ url: serverUrl }];
+  docs.servers = [{ url: configService.get('SERVER_DOMAIN_URL') || serverUrl }];
   SwaggerModule.setup('swagger', app, docs);
 
   await app.listen(serverPort, '0.0.0.0');

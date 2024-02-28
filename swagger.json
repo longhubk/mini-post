@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "servers": [
     {
-      "url": "http://localhost:3004",
+      "url": "https://mini-post-api.vs-blog.tech",
       "description": "Local Server"
     }
   ],
@@ -71,17 +71,24 @@
         "tags": [
           "Post"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/GenericFilterIPost"
+            },
+            "description": "",
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/IPost"
-                  }
+                  "$ref": "#/components/schemas/PaginatePostResponse"
                 }
               }
             }
@@ -273,10 +280,14 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 1,
+            "minLength": 1
           },
           "content": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 10
           },
           "isPublished": {
             "type": "boolean"
@@ -377,6 +388,65 @@
           "username"
         ]
       },
+      "GenericFilterIPost": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 1
+          },
+          "orderBy": {
+            "type": "string",
+            "enum": [
+              "views",
+              "user",
+              "created_at",
+              "updated_at",
+              "deleted_at",
+              "id",
+              "title",
+              "content",
+              "isPublished"
+            ]
+          },
+          "sortOrder": {
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ]
+          }
+        },
+        "nullable": false,
+        "required": [
+          "page",
+          "pageSize"
+        ]
+      },
+      "PaginatePostResponse": {
+        "type": "object",
+        "properties": {
+          "posts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IPost"
+            }
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "nullable": false,
+        "required": [
+          "posts",
+          "total"
+        ]
+      },
       "IPost.Nullable": {
         "type": "object",
         "properties": {
@@ -434,10 +504,14 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 1,
+            "minLength": 1
           },
           "content": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 10
           },
           "isPublished": {
             "type": "boolean"

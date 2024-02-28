@@ -49,16 +49,16 @@ export enum SortOrder {
 
 export const PAGE_MIN_LEN = STRING_MIN_LEN;
 export const PAGE_SIZE_MAX_LEN = 100;
-export const PAGE_SIZE_MIN_LEN = 10;
+export const PAGE_SIZE_MIN_LEN = 1;
 
-export interface GenericFilter {
-  page: number & tags.MinLength<typeof PAGE_MIN_LEN>;
+export interface GenericFilter<T> {
+  page: number & tags.Minimum<typeof PAGE_MIN_LEN>;
 
   pageSize: number &
-    tags.MinLength<typeof PAGE_SIZE_MIN_LEN> &
-    tags.MaxLength<typeof PAGE_SIZE_MAX_LEN>;
+    tags.Minimum<typeof PAGE_SIZE_MIN_LEN> &
+    tags.Maximum<typeof PAGE_SIZE_MAX_LEN>;
 
-  orderBy?: keyof IChatMessage;
+  orderBy?: keyof T;
 
   sortOrder?: SortOrder;
 }

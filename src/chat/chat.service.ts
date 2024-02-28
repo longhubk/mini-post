@@ -105,7 +105,7 @@ export class ChatService {
     return this.chatMsgRepo.save(chatMsg);
   }
 
-  protected createOrderQuery(filter: GenericFilter) {
+  protected createOrderQuery(filter: GenericFilter<IChatMessage>) {
     const order: { [k in keyof Partial<IChatMessage>]: SortOrder } = {};
 
     order.created_at = SortOrder.DESC;
@@ -119,7 +119,7 @@ export class ChatService {
   }
 
   public paginateMessage(
-    filter: GenericFilter,
+    filter: GenericFilter<IChatMessage>,
     where: FindOptionsWhere<ChatMessage>,
   ): Promise<[ChatMessage[], number]> {
     return this.chatMsgRepo.findAndCount({

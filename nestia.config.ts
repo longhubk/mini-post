@@ -28,7 +28,7 @@ const NESTIA_CONFIG: INestiaConfig = {
     },
     servers: [
       {
-        url: "http://localhost:3004",
+        url: "https://mini-post-api.vs-blog.tech",
         description: "Local Server",
       },
     ],
