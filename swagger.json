@@ -281,7 +281,7 @@
         "properties": {
           "title": {
             "type": "string",
-            "maxLength": 1,
+            "maxLength": 50,
             "minLength": 1
           },
           "content": {
@@ -505,7 +505,7 @@
         "properties": {
           "title": {
             "type": "string",
-            "maxLength": 1,
+            "maxLength": 50,
             "minLength": 1
           },
           "content": {
