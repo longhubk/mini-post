@@ -15,6 +15,6 @@
 # Demo
 - [HTTP Endpoint ](https://mini-post-api.vs-blog.tech/)
 - [Swagger](https://mini-post-api.vs-blog.tech/swagger)
-- [Socket Endpoint](wss://mini-post-socket.vs-blog.tech/chat)
+- Socket Endpoint: wss://mini-post-socket.vs-blog.tech/chat
 - [Demo Video On Youtube](https://www.youtube.com/watch?v=VvWiES2GC6Y)
 
